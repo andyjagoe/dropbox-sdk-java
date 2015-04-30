@@ -19,6 +19,7 @@ abstract class DbxWebAuthHelper
                 "response_type", "code",
                 "redirect_uri", redirectUri,
                 "state", state,
+                "force_reapprove", "true",
             });
     }
 
