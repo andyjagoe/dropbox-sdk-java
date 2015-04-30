@@ -1,3 +1,9 @@
+# Fireside Instructions
+
+This version of dropbox-java-sdk has been modified so that a) force_reapproval=true is set on all Oauth interactions, and b) our deploy files are pushed to a custom Maven repository hosted in the mvn-repo branch.
+
+To push an updated version to the custom Maven Repo, use ```mvn clean deploy``` and make sure you have a correctly configured settings.xml file with your credentials to allow pushing to andyjagoe/dropbox-java-sdk.
+
 # Dropbox Core SDK for Java 6+
 
 A Java library to access [Dropbox's HTTP-based Core API](https://www.dropbox.com/developers/core/docs).
