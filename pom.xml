@@ -57,7 +57,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>[2.2,2.4)</version>
+            <version>[2.2,2.7)</version>
         </dependency>
 
         <!-- A "soft" dependency on the Servlet API. -->
@@ -65,6 +65,14 @@
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
             <version>2.2</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- A "soft" dependency on OkHttp. -->
+        <dependency>
+            <groupId>com.squareup.okhttp</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>2.5.0</version>
             <scope>provided</scope>
         </dependency>
 
@@ -93,7 +101,7 @@
                 <filtering>true</filtering>
             </resource>
             <resource>
-                <directory>${project.build.directory}/generated-resources/pem-to-jks</directory>
+                <directory>${project.build.directory}/generated-resources/certs</directory>
             </resource>
         </resources>
         <testSourceDirectory>test</testSourceDirectory>
@@ -222,13 +230,13 @@
             </plugin>
             <plugin>
                 <groupId>com.dropbox.maven</groupId>
-                <artifactId>pem-to-jks-maven-plugin</artifactId>
+                <artifactId>pem-converter-maven-plugin</artifactId>
                 <version>1.0</version>
                 <executions>
                     <execution>
                         <configuration>
-                            <inputPem>src/com/dropbox/core/http/trusted-certs.crt</inputPem>
-                            <outputJks>${project.build.directory}/generated-resources/pem-to-jks/com/dropbox/core/http/trusted-certs.jks</outputJks>
+                            <input>src/com/dropbox/core/http/trusted-certs.crt</input>
+                            <output>${project.build.directory}/generated-resources/certs/com/dropbox/core/http/trusted-certs.raw</output>
                         </configuration>
                         <goals>
                             <goal>convert</goal>

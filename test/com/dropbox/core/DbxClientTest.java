@@ -1,5 +1,6 @@
 package com.dropbox.core;
 
+import com.dropbox.core.http.OkHttpRequestor;
 import com.dropbox.core.json.JsonReader;
 import com.dropbox.core.util.Dumpable;
 import com.dropbox.core.util.IOUtil;
@@ -50,7 +51,17 @@ public class DbxClientTest
             throw new RuntimeException("Error reading auth info from \"" + authInfoFile + "\": " + ex.getMessage());
         }
 
-        DbxRequestConfig requestConfig = new DbxRequestConfig("sdk-test", null);
+        DbxRequestConfig requestConfig;
+        String okHttp = System.getProperty("okHttp");
+        if (okHttp == null || okHttp.equals("false")) {
+            requestConfig = new DbxRequestConfig("sdk-test", null);
+        } else if (okHttp.equals("true")) {
+            requestConfig = new DbxRequestConfig("sdk-test", null, OkHttpRequestor.Instance);
+        } else {
+            throw new RuntimeException("Invalid value for System property \"okHttp\"." +
+                    " Expecting \"true\" or \"false\", got " + jq(okHttp) + ".");
+        }
+
         DbxClient client = new DbxClient(requestConfig, authInfo.accessToken, authInfo.host);
 
         String timestamp = new SimpleDateFormat("yyyy-MM-dd HH.mm.ss").format(new Date());
@@ -197,7 +208,7 @@ public class DbxClientTest
         // be run on an account that has nothing else going on?
 
         // Get latest cursors before modifying dropbox folders
-        String latestCursor = client.getDeltaLatestCursorWithPathPrefix(p());
+        String latestCursor = client.getDeltaLatestCursor();
         String latestCursorWithPath = client.getDeltaLatestCursorWithPathPrefix(p("b"));
         assertNotNull(latestCursor);
         assertNotNull(latestCursorWithPath);
@@ -263,7 +274,6 @@ public class DbxClientTest
             while (true) {
                 DbxDelta<DbxEntry> d = client.getDelta(cursor);
                 for (DbxDelta.Entry<DbxEntry> e : d.entries) {
-                    System.out.print(e.toStringMultiline());
                     assertTrue(e.lcPath.startsWith(lcPrefix+"/") || e.lcPath.equals(lcPrefix));
                     assertNotNull(e.metadata);  // We shouldn't see deletes in our test folder.
                     boolean removed = expected.remove(e.metadata);
@@ -560,7 +570,7 @@ public class DbxClientTest
                 DbxEntry.File md = client.getThumbnail(size, format, orig, null, out);
                 byte[] data = out.toByteArray();
 
-                assertEquals(origMD, md);
+                assertEquals(removeMediaInfo(origMD), removeMediaInfo(md));
 
                 // We're getting bigger and bigger thumbnails, so they should have more bytes
                 // than the previous ones.
@@ -575,6 +585,12 @@ public class DbxClientTest
                     "expected = " + expectedW + "x" + expectedH + ", got = " + w + "x" + h);
             }
         }
+    }
+
+    private static DbxEntry.File removeMediaInfo(DbxEntry.File e)
+    {
+        return new DbxEntry.File(e.path, e.iconName, e.mightHaveThumbnail, e.numBytes, e.humanSize,
+                                 e.lastModified, e.clientMtime, e.rev);
     }
 
     private static ImageReader getImageReaderForFormat(DbxThumbnailFormat format)

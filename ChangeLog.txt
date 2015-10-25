@@ -1,8 +1,24 @@
+---------------------------------------------
+1.8.2 (2015-10-19)
+
+- Fix bug parsing "photo_info" in file metadata.
+- Add support for /account/info fields: email, email_verified,
+  name_details.
+
+---------------------------------------------
+1.8.1 (2015-09-21)
+
+- Fix bug in version validation code that caused crash at startup.
+
+---------------------------------------------
+1.8 (2015-09-14)
+
 - Include SDK version in HTTP requests (via the User-Agent header).
 - Fix 'urlState' handling in DbxWebAuth.  Was mistakenly include the
   '|' separator.
 - Add support for /delta/latest_cursor and /longpoll_delta.
 - Add support for include_media_info=true on /metadata and /delta.
+- Add support for using OkHttp as the underlying HTTP client.
 
 ---------------------------------------------
 1.7.7 (2014-09-02)
